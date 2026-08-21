@@ -1,1 +1,1 @@
-import 'expo-router/entry';
+// Unused — Vite boots from index.html → src/main.tsx

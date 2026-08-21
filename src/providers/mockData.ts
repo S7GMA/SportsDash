@@ -1,4 +1,4 @@
-import { SportEvent, Sport, League, Team, Player, Driver, Standings, F1Session } from '@/domain/types';
+import { SportEvent, Sport, League, Team, Player, Driver, Standings } from '@/domain/types';
 
 // ============================================================================
 // MOCK DATA - Realistic fixtures for F1, NFL, NBA, MLB, Soccer

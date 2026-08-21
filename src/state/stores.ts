@@ -1,389 +1,158 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type {
+  Appearance,
+  AppNotification,
+  Favorite,
+  FavoriteType,
+  NotificationPreferences,
+  RecentlyViewedItem,
+} from '@/domain/types';
+import { getUserTimezone } from '@/lib/time';
 
-// Storage Adapter interface - abstracts platform-specific storage
-export interface StorageAdapter {
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T): Promise<void>;
-  remove(key: string): Promise<void>;
-  clear(): Promise<void>;
-  keys(): Promise<string[]>;
-}
-
-// Web implementation using localStorage
-export class LocalStorageAdapter implements StorageAdapter {
-  get<T>(key: string): Promise<T | null> {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? Promise.resolve(JSON.parse(item)) : Promise.resolve(null);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  set<T>(key: string, value: T): Promise<void> {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value));
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  remove(key: string): Promise<void> {
-    try {
-      window.localStorage.removeItem(key);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  clear(): Promise<void> {
-    try {
-      window.localStorage.clear();
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  keys(): Promise<string[]> {
-    try {
-      const keys = Object.keys(window.localStorage);
-      return Promise.resolve(keys);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-}
-
-// AsyncStorage implementation for React Native
-export class AsyncStorageAdapter implements StorageAdapter {
-  constructor(private storage: any) {}
-
-  async get<T>(key: string): Promise<T | null> {
-    try {
-      const item = await this.storage.getItem(key);
-      return item ? Promise.resolve(JSON.parse(item)) : Promise.resolve(null);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async set<T>(key: string, value: T): Promise<void> {
-    try {
-      await this.storage.setItem(key, JSON.stringify(value));
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async remove(key: string): Promise<void> {
-    try {
-      await this.storage.removeItem(key);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async clear(): Promise<void> {
-    try {
-      await this.storage.clear();
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async keys(): Promise<string[]> {
-    try {
-      const keys = await this.storage.getAllKeys();
-      return Promise.resolve(keys);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-}
-
-// ============================================================================
-// ZUSTAND STORES
-// ============================================================================
-
-// User profile store - persisted
-export interface UserProfile {
-  id: string;
+export interface UserPrefs {
   onboardingComplete: boolean;
-  favoriteSports: string[];
-  favoriteTeams: string[];
-  favoritePlayers: string[];
-  favoriteDrivers: string[];
-  favoriteLeagues: string[];
-  favoriteCompetitions: string[];
-  notifications: NotificationPreferences;
-  display: DisplayPreferences;
-  recentlyViewed: RecentlyViewedItem[];
-  followedEvents: string[];
-  personalizationSignals: PersonalizationSignal[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NotificationPreferences {
-  enabled: boolean;
-  eventStarting: boolean;
-  eventStarted: boolean;
-  scoreChange: boolean;
-  favoriteScored: boolean;
-  eventFinished: boolean;
-  statusChange: boolean;
-  minutesBeforeStart: number;
-}
-
-export interface DisplayPreferences {
+  preferredSports: string[];
   timezone: string;
   appearance: Appearance;
   showEventTimezone: boolean;
-  compactMode: boolean;
-  autoRefresh: boolean;
-  refreshInterval: number;
+  notifications: NotificationPreferences;
 }
 
-export interface RecentlyViewedItem {
-  id: string;
-  type: FavoriteType;
-  name: string;
-  viewedAt: string;
-}
-
-export interface PersonalizationSignal {
-  entityType: FavoriteType;
-  entityId: string;
-  signal: 'favorite' | 'recently_viewed' | 'followed_event' | 'notification_interaction';
-  weight: number;
-  timestamp: string;
-}
-
-export interface FavoritesState {
-  favorites: Favorite[];
-}
-
-export interface UserPrefsState {
-  userProfile: UserProfile | null;
-  isOnboardingComplete: boolean;
-}
-
-export interface NotificationState {
-  notifications: AppNotification[];
-  unreadCount: number;
-}
-
-export interface EventState {
-  events: SportEvent[];
-  lastUpdated: string;
-  isLoading: boolean;
-}
-
-export interface CacheState {
-  cachedUserProfile: UserProfile | null;
-  cachedSportsData: Record<string, any>;
-  lastSync: string;
-}
-
-export const createUserPrefsStore = (storageAdapter: StorageAdapter) => {
-  return create<{ userPrefs: UserPrefsState }>((set, get) => ({
-    userPrefs: {
-      userProfile: null,
-      isOnboardingComplete: false,
-    },
-    setUserProfile: (profile: UserProfile) => set((state) => ({
-      userPrefs: {
-        ...state.userPrefs,
-        userProfile: profile,
-      },
-    })),
-    setOnboardingComplete: (complete: boolean) =>
-      set((state) => ({
-        userPrefs: {
-          ...state.userPrefs,
-          isOnboardingComplete: complete,
-        },
-      })),
-    },
-    getUserProfile: () => get(state => state.userPrefs.userProfile),
-    getOnboardingComplete: () => get(state => state.userPrefs.isOnboardingComplete),
-  }));
+const defaultPrefs: UserPrefs = {
+  onboardingComplete: false,
+  preferredSports: [],
+  timezone: getUserTimezone(),
+  appearance: 'dark',
+  showEventTimezone: true,
+  notifications: {
+    enabled: true,
+    eventStarting: true,
+    eventStarted: true,
+    scoreChange: false,
+    favoriteScored: true,
+    eventFinished: true,
+    statusChange: true,
+    minutesBeforeStart: 15,
+  },
 };
 
-// Favorites store - persisted
-export interface Favorite {
-  id: string;
-  type: FavoriteType;
-  refId: string;
-  name: string;
-  addedAt: string;
-}
-
-export interface FavoritesState {
+interface FavoritesStore {
   favorites: Favorite[];
+  toggleFavorite: (fav: Omit<Favorite, 'addedAt'>) => void;
+  isFavorite: (type: FavoriteType, refId: string) => boolean;
+  removeFavorite: (type: FavoriteType, refId: string) => void;
+  clear: () => void;
 }
 
-export const createFavoritesStore = (storageAdapter: StorageAdapter) => {
-  return create<{ favorites: FavoritesState }>((set, get) => ({
-    favorites: {
+export const useFavoritesStore = create<FavoritesStore>()(
+  persist(
+    (set, get) => ({
       favorites: [],
-    },
-    addFavorite: (favorite: Favorite) =>
-      set((state) => ({
-        favorites: {
-          ...state.favorites,
-          favorites: [...state.favorites.favorites, favorite],
-        },
-      })),
-    removeFavorite: (id: string, type: FavoriteType) =>
-      set((state) => ({
-        favorites: {
-          ...state.favorites,
-          favorites: state.favorites.favorites.filter(
-            (f) => !(f.id === id && f.type === type)
-          ),
-        },
-      })),
-    isFavorite: (id: string, type: FavoriteType) =>
-      get(state => state.favorites.favorites.some(f => f.id === id && f.type === type)),
-    getFavorites: () => get(state => state.favorites.favorites),
-  });
-};
-
-// Notification store - persisted
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  eventId: string;
-  sportId: string;
-  title: string;
-  body: string;
-  timestamp: string;
-  read: boolean;
-  data?: any;
-}
-
-export interface NotificationState {
-  notifications: AppNotification[];
-  unreadCount: number;
-}
-
-export const createNotificationStore = (storageAdapter: StorageAdapter) => {
-  return create<{ notifications: NotificationState }>((set, get) => ({
-    notifications: {
-      notifications: [],
-      unreadCount: 0,
-    },
-    addNotification: (notification: AppNotification) =>
-      set((state) => {
-        const updated = [...state.notifications.notifications, notification];
-        const unreadCount = notification.read ? state.notifications.notifications.length : updated.filter(n => !n.read).length;
-        return {
-          notifications: { ...state.notifications, notifications: updated },
-          unreadCount,
-        };
-      }),
-    markAsRead: (notificationId: string) =>
-      set((state) => {
-        const updated = state.notifications.notifications.map(n =>
-          n.id === notificationId ? { ...n, read: true } : n
-        );
-        const unreadCount = updated.filter(n => !n.read).length;
-        return {
-          notifications: { ...state.notifications, notifications: updated },
-          unreadCount,
-        };
-      }),
-  }));
-};
-
-// Cache store - non-persisted
-export interface CacheState {
-  cachedUserProfile: UserProfile | null;
-  cachedSportsData: Record<string, any>;
-  lastSync: string;
-}
-
-export const createCacheStore = () => {
-  return create<{ cache: CacheState }>((set, get) => ({
-    cache: {
-      cachedUserProfile: null,
-      cachedSportsData: {},
-      lastSync: new Date().toISOString(),
-    },
-    setCachedUserProfile: (profile: UserProfile | null) =>
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          cachedUserProfile: profile,
+      toggleFavorite: (fav) =>
+        set((state) => {
+          const exists = state.favorites.some((f) => f.type === fav.type && f.refId === fav.refId);
+          if (exists) {
+            return {
+              favorites: state.favorites.filter((f) => !(f.type === fav.type && f.refId === fav.refId)),
+            };
+          }
+          return {
+            favorites: [
+              ...state.favorites,
+              { ...fav, id: `${fav.type}:${fav.refId}`, addedAt: new Date().toISOString() },
+            ],
+          };
         }),
-      }),
-    setCachedSportsData: (data: Record<string, any>) =>
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          cachedSportsData: data,
-        }),
-    },
-    getCachedUserProfile: () => get(state) => state.cache.cachedUserProfile,
-    getCachedSportsData: () => get(state) => state.cache.cachedSportsData,
-  }));
-};
+      isFavorite: (type, refId) => get().favorites.some((f) => f.type === type && f.refId === refId),
+      removeFavorite: (type, refId) =>
+        set((state) => ({
+          favorites: state.favorites.filter((f) => !(f.type === type && f.refId === refId)),
+        })),
+      clear: () => set({ favorites: [] }),
+    }),
+    { name: 'sportsdash:favorites', storage: createJSONStorage(() => localStorage) },
+  ),
+);
 
-// Combined store for convenience
-export interface AppStore {
-  userPrefs: UserPrefsState;
-  favorites: FavoritesState;
-  notifications: NotificationState;
-  events: EventState;
-  cache: CacheState;
+interface PrefsStore extends UserPrefs {
+  setOnboardingComplete: (value: boolean) => void;
+  setPreferredSports: (ids: string[]) => void;
+  setAppearance: (appearance: Appearance) => void;
+  setShowEventTimezone: (value: boolean) => void;
+  setNotifications: (patch: Partial<NotificationPreferences>) => void;
+  reset: () => void;
 }
 
-export const createAppStore = (storageAdapter: StorageAdapter) => {
-  const userPrefs = createUserPrefsStore(storageAdapter);
-  const favorites = createFavoritesStore(storageAdapter);
-  const notifications = createNotificationStore(storageAdapter);
-  const cache = createCacheStore();
+export const usePrefsStore = create<PrefsStore>()(
+  persist(
+    (set) => ({
+      ...defaultPrefs,
+      setOnboardingComplete: (value) => set({ onboardingComplete: value }),
+      setPreferredSports: (ids) => set({ preferredSports: ids }),
+      setAppearance: (appearance) => set({ appearance }),
+      setShowEventTimezone: (value) => set({ showEventTimezone: value }),
+      setNotifications: (patch) =>
+        set((state) => ({ notifications: { ...state.notifications, ...patch } })),
+      reset: () => set({ ...defaultPrefs, timezone: getUserTimezone() }),
+    }),
+    { name: 'sportsdash:userPrefs', storage: createJSONStorage(() => localStorage) },
+  ),
+);
 
-  return {
-    userPrefs,
-    favorites,
-    notifications,
-    events: createEventStore(),
-    cache,
-  });
-};
+interface RecentsStore {
+  items: RecentlyViewedItem[];
+  view: (item: Omit<RecentlyViewedItem, 'viewedAt'>) => void;
+}
 
-// Helper to create events store
-const createEventStore = (storageAdapter: StorageAdapter) => {
-  return create<{ events: EventState }>((set, get) => ({
-    events: {
-      events: [],
-      lastUpdated: new Date().toISOString(),
-      isLoading: false,
-    },
-    setEvents: (events: SportEvent[], lastUpdated: string) =>
-      set((state) => ({
-        events: {
-          ...state.events,
-          events: events,
-          lastUpdated: lastUpdated,
-          isLoading: false,
-        },
-      }),
-    setLoading: (isLoading: boolean) =>
-      set((state) => ({
-        events: {
-          ...state.events,
-          isLoading: isLoading,
-        },
-      }),
-    getEvents: () => get(state) => state.events.events,
-  }));
-};
+export const useRecentsStore = create<RecentsStore>()(
+  persist(
+    (set) => ({
+      items: [],
+      view: (item) =>
+        set((state) => {
+          const next = [
+            { ...item, viewedAt: new Date().toISOString() },
+            ...state.items.filter((i) => !(i.type === item.type && i.id === item.id)),
+          ].slice(0, 20);
+          return { items: next };
+        }),
+    }),
+    { name: 'sportsdash:recentlyViewed', storage: createJSONStorage(() => localStorage) },
+  ),
+);
+
+interface NotificationStore {
+  items: AppNotification[];
+  add: (n: Omit<AppNotification, 'id' | 'timestamp' | 'read'>) => void;
+  markRead: (id: string) => void;
+  markAllRead: () => void;
+  clear: () => void;
+}
+
+export const useNotificationStore = create<NotificationStore>()(
+  persist(
+    (set) => ({
+      items: [],
+      add: (n) =>
+        set((state) => ({
+          items: [
+            {
+              ...n,
+              id: `${n.eventId}-${n.type}-${Date.now()}`,
+              timestamp: new Date().toISOString(),
+              read: false,
+            },
+            ...state.items,
+          ].slice(0, 50),
+        })),
+      markRead: (id) =>
+        set((state) => ({
+          items: state.items.map((i) => (i.id === id ? { ...i, read: true } : i)),
+        })),
+      markAllRead: () => set((state) => ({ items: state.items.map((i) => ({ ...i, read: true })) })),
+      clear: () => set({ items: [] }),
+    }),
+    { name: 'sportsdash:notifications', storage: createJSONStorage(() => localStorage) },
+  ),
+);
