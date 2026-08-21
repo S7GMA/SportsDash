@@ -1,0 +1,277 @@
+/**
+ * Collectables Page Styles
+ */
+
+.collectables-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* Header */
+.collectables-header {
+  margin-bottom: 32px;
+}
+
+.collectables-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--ivy-dark, #1a1a1a);
+  margin: 0 0 12px;
+}
+
+.collectables-description {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  color: var(--mute, #888);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+/* Filters */
+.collectables-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ivy-dark, #1a1a1a);
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-button {
+  padding: 8px 16px;
+  border: 1px solid var(--mint, #00d9a3);
+  background: transparent;
+  color: var(--mint, #00d9a3);
+  font-family: 'Arial', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background: var(--mint, #00d9a3);
+  color: #000;
+}
+
+.filter-button.active {
+  background: var(--mint, #00d9a3);
+  color: #000;
+}
+
+/* Summary */
+.collectables-summary {
+  margin-bottom: 16px;
+}
+
+.summary-text {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--mute, #888);
+  margin: 0;
+}
+
+/* Grid */
+.collectables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.collectables-card-wrapper {
+  width: 100%;
+  /* height comes from .trading aspect-ratio — don't nest another ratio */
+}
+
+/* Empty State */
+.collectables-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.collectables-empty p {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  color: var(--mute, #888);
+  margin: 8px 0;
+}
+
+.collectables-empty p:first-child {
+  margin-top: 0;
+}
+
+/* Info Section */
+.collectables-info {
+  margin-top: 48px;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(0, 217, 163, 0.05), rgba(100, 200, 255, 0.05));
+  border-radius: 8px;
+}
+
+.collectables-info h2 {
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--ivy-dark, #1a1a1a);
+  margin: 0 0 24px;
+}
+
+.collectables-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin: 0;
+}
+
+.legend-term {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.legend-badge {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.legend-badge.common {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
+.legend-badge.holographic {
+  background: linear-gradient(135deg, #00d9a3, #00a3d9);
+  animation: holographic-shimmer 4s ease-in-out infinite;
+}
+
+.legend-badge.special {
+  background: linear-gradient(135deg, #ff6b9d, #ffd700);
+}
+
+.legend-term + dd {
+  grid-column: 1 / -1;
+  margin: -20px 0 0 0;
+  padding-left: 120px;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  color: var(--mute, #888);
+  font-weight: normal;
+}
+
+/* Loading */
+.loading-message {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--mute, #888);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .collectables-page {
+    padding: 24px 12px;
+  }
+
+  .collectables-title {
+    font-size: 36px;
+  }
+
+  .collectables-filters {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .collectables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .legend-term + dd {
+    padding-left: 0;
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .collectables-page {
+    padding: 16px 8px;
+  }
+
+  .collectables-title {
+    font-size: 28px;
+  }
+
+  .collectables-description {
+    font-size: 14px;
+  }
+
+  .filter-buttons {
+    gap: 6px;
+  }
+
+  .filter-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .collectables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .collectables-info {
+    padding: 16px;
+  }
+
+  .collectables-legend {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Keyframes for holographic effect in legend */
+@keyframes holographic-shimmer {
+  0%, 100% {
+    background: linear-gradient(135deg, #00d9a3, #00a3d9);
+  }
+  50% {
+    background: linear-gradient(135deg, #00a3d9, #00d9a3);
+  }
+}

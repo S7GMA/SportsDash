@@ -1,0 +1,129 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import type { CareerRecord, DbsDriver } from '@/domain/dbs';
+import { HeartButton } from '@/components/HeartButton';
+
+const HELMET = '/brand/helmet.svg';
+
+function Portrait({ src, alt }: { src?: string; alt: string }) {
+  const [broken, setBroken] = useState(false);
+  const showPhoto = Boolean(src) && !broken;
+  return showPhoto ? (
+    <img
+      src={src}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      decoding="async"
+      onError={() => setBroken(true)}
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '46%',
+        transform: 'translate(-50%, -50%)',
+        width: '92%',
+        height: '68%',
+        objectFit: 'contain',
+        objectPosition: 'center top',
+        zIndex: 1,
+        imageRendering: 'auto',
+      }}
+    />
+  ) : (
+    <img
+      src={HELMET}
+      alt=""
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '46%',
+        transform: 'translate(-50%, -50%)',
+        width: '58%',
+        height: '52%',
+        objectFit: 'contain',
+        zIndex: 1,
+        opacity: 0.95,
+      }}
+    />
+  );
+}
+
+export function DriverCard({ driver, career }: { driver: DbsDriver; career?: CareerRecord }) {
+  return (
+    <Link to={`/driver/${driver.id}`} className="trading" style={{ display: 'block' }}>
+      <div className="trading-inner">
+        <div className="face" style={{ background: `linear-gradient(180deg, ${driver.teamColor} 0%, #16382c 58%)` }}>
+          <img src="/brand/dannyboy-logo.png" alt="" className="crest" style={{ position: 'absolute', top: 10, right: 10, zIndex: 2, height: 26 }} />
+          <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}>
+            <div className="mono" style={{ fontSize: 12, color: 'var(--mint)' }}>{driver.teamName}</div>
+            <div className="wordmark" style={{ fontSize: 52, lineHeight: 0.85, color: '#fff' }}>
+              {String(driver.number).padStart(2, '0')}
+            </div>
+          </div>
+          <Portrait src={driver.headshot} alt={driver.name} />
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 2, padding: 12, background: 'linear-gradient(transparent, #10241c)' }}>
+            <div className="kicker" style={{ color: 'var(--mint)', fontSize: 14 }}>{driver.code} · P{driver.season.position}</div>
+            <div className="display" style={{ fontSize: 22, color: '#fff' }}>{driver.name}</div>
+            <div className="mono" style={{ fontSize: 12, color: 'var(--mint)' }}>
+              {driver.season.points} pts · {driver.season.wins} wins
+            </div>
+          </div>
+        </div>
+        <div className="face back">
+          <div style={{ padding: 16, height: '100%', display: 'grid', alignContent: 'space-between' }}>
+            <div>
+              <div className="kicker" style={{ color: 'var(--mint)', fontSize: 14 }}>All-time record</div>
+              <div className="display" style={{ fontSize: 24, margin: '6px 0 12px', color: '#fff' }}>{driver.name}</div>
+              <div className="stat-grid">
+                <div><strong>{career?.races ?? '—'}</strong><span>Races</span></div>
+                <div><strong>{career?.wins ?? '—'}</strong><span>Wins</span></div>
+                <div><strong>{career?.podiums ?? '—'}</strong><span>Podiums</span></div>
+                <div><strong>{career?.poles ?? '—'}</strong><span>Poles</span></div>
+                <div><strong>{career?.championships ?? '—'}</strong><span>Titles</span></div>
+                <div><strong>{career?.points ?? '—'}</strong><span>Points</span></div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span className="mono" style={{ fontSize: 12, color: 'var(--mint)' }}>Hover to flip</span>
+              <HeartButton type="driver" refId={driver.id} name={driver.name} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+export function TeamTradingCard({
+  name,
+  logo,
+  color,
+  meta,
+  href,
+  type,
+  refId,
+}: {
+  name: string;
+  logo?: string;
+  color: string;
+  meta: string;
+  href: string;
+  type: 'team' | 'league';
+  refId: string;
+}) {
+  return (
+    <Link to={href} className="athlete-tile" style={{ display: 'block' }}>
+      <div style={{ height: 110, display: 'grid', placeItems: 'center', background: `linear-gradient(180deg, ${color}, #16382c)` }}>
+        {logo ? (
+          <img src={logo} alt="" className="team-crest" style={{ height: 72, width: 72 }} />
+        ) : (
+          <img src="/brand/dannyboy-logo.png" alt="" className="logo" style={{ height: 32 }} />
+        )}
+      </div>
+      <div style={{ padding: 12 }}>
+        <div className="display" style={{ fontSize: 17, color: '#fff' }}>{name}</div>
+        <div className="mono" style={{ fontSize: 12, color: 'var(--mint)', margin: '4px 0 8px' }}>{meta}</div>
+        <HeartButton type={type} refId={refId} name={name} />
+      </div>
+    </Link>
+  );
+}

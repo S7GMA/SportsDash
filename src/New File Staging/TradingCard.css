@@ -1,0 +1,745 @@
+/**
+ * Trading Card Styles
+ * 
+ * Comprehensive styling for trading cards across all sports and versions.
+ * Includes:
+ * - 3D flip animation
+ * - Holographic effect
+ * - Responsive design
+ * - Accessibility (reduced-motion)
+ * - Sport-specific customization
+ */
+
+/* ============================================================================
+   CARD CONTAINER & PERSPECTIVE
+   ============================================================================ */
+
+.trading-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.trading {
+  display: block;
+  width: 100%;
+  aspect-ratio: 210 / 320;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  
+  /* Ensure card stays within bounds */
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.trading:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Focus state for keyboard navigation */
+.trading:focus-visible {
+  outline: 2px solid var(--mint, #00d9a3);
+  outline-offset: 2px;
+}
+
+/* Inner container with 3D perspective */
+.trading-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-style: preserve-3d;
+}
+
+/* Flip state */
+.trading-flipped .trading-inner {
+  transform: rotateY(180deg);
+}
+
+/* Remove animation if user prefers reduced motion */
+.trading-no-motion .trading-inner {
+  transition: none;
+}
+
+/* ============================================================================
+   CARD FACES (FRONT & BACK)
+   ============================================================================ */
+
+.trading-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+}
+
+/* Front face (default visibility) */
+.trading-front {
+  z-index: 2;
+  backface-visibility: hidden;
+}
+
+/* Back face (hidden until flipped) */
+.trading-back {
+  z-index: 1;
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, #16382c 0%, #10241c 100%);
+  backface-visibility: hidden;
+}
+
+/* ============================================================================
+   CARD CONTENT - FRONT
+   ============================================================================ */
+
+.card-front-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Portrait image styling */
+.card-portrait {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  height: 68%;
+  object-fit: contain;
+  object-position: center top;
+  z-index: 1;
+  image-rendering: auto;
+  -webkit-user-drag: none;
+}
+
+.card-portrait-photo {
+  /* Photo styling */
+}
+
+.card-portrait-fallback {
+  width: 58%;
+  height: 52%;
+  opacity: 0.95;
+}
+
+/* Team crest/logo */
+.card-crest {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  height: 26px;
+  width: auto;
+}
+
+/* Team badge (top left) */
+.card-team-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-team-label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--mint, #00d9a3);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Large number display (F1-specific) */
+.card-number-section {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+
+.card-number {
+  font-family: 'Arial', sans-serif;
+  font-size: 52px;
+  font-weight: bold;
+  line-height: 0.85;
+  color: #ffffff;
+  letter-spacing: -2px;
+}
+
+/* Footer gradient and text */
+.card-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 12px;
+  background: linear-gradient(transparent, rgba(16, 36, 28, 0.95));
+  text-align: left;
+}
+
+.card-code-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.card-code,
+.card-position {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--mint, #00d9a3);
+  font-weight: 500;
+}
+
+.card-name {
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 4px 0 2px;
+  line-height: 1.2;
+}
+
+.card-subtext,
+.card-stat-line {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--mint, #00d9a3);
+  margin-top: 2px;
+}
+
+/* Position label (for non-F1 sports) */
+.card-position-label {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: var(--mint, #00d9a3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+/* Card texture overlay */
+.card-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    );
+  pointer-events: none;
+}
+
+/* ============================================================================
+   CARD CONTENT - BACK
+   ============================================================================ */
+
+.card-back-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-back-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-back-header {
+  flex-shrink: 0;
+}
+
+.card-back-label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--mint, #00d9a3);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.card-back-name {
+  font-family: 'Arial', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+/* Stat grid */
+.card-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  flex-grow: 1;
+  align-content: start;
+}
+
+.card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.card-stat-value {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  display: block;
+}
+
+.card-stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: var(--mint, #00d9a3);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Back footer */
+.card-back-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.card-hint {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: var(--mint, #00d9a3);
+}
+
+/* Empty state */
+.card-back-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  color: var(--mint, #00d9a3);
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.card-back-text {
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+/* ============================================================================
+   SPECIAL CARDS
+   ============================================================================ */
+
+.card-special-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-special-image,
+.card-special-static-image,
+.card-special-animated-image,
+.card-special-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.card-special-video {
+  z-index: 3;
+}
+
+/* Badge overlay */
+.card-special-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  background: rgba(0, 217, 163, 0.9);
+  color: #000;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Overlay with gradient fade */
+.card-special-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+}
+
+.card-special-name {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.card-special-fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ============================================================================
+   HOLOGRAPHIC EFFECT
+   ============================================================================ */
+
+.trading-holographic .holographic-shimmer,
+.trading-holographic .holographic-light,
+.trading-holographic .holographic-rainbow,
+.trading-holographic .holographic-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Main shimmer effect - diagonal sweep */
+.holographic-shimmer {
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 50%
+  );
+  background-size: 200% 200%;
+  animation: holographic-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes holographic-shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* Iridescent light effect */
+.holographic-light {
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(0, 217, 163, 0.1) 0%,
+    transparent 50%
+  );
+  animation: holographic-light 6s ease-in-out infinite;
+}
+
+@keyframes holographic-light {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Rainbow gradient sweep */
+.holographic-rainbow {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 128, 0.05),
+    rgba(0, 217, 163, 0.05),
+    rgba(100, 200, 255, 0.05),
+    rgba(255, 0, 128, 0.05)
+  );
+  background-size: 200% 100%;
+  animation: holographic-rainbow 8s linear infinite;
+}
+
+@keyframes holographic-rainbow {
+  0% {
+    background-position: -200% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+/* Static texture */
+.holographic-texture {
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.05) 2px,
+      rgba(255, 255, 255, 0.05) 4px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.03) 2px,
+      rgba(255, 255, 255, 0.03) 4px
+    );
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   ACTIONS/FAVORITES
+   ============================================================================ */
+
+.trading-with-actions .trading-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+}
+
+.trading-actions {
+  display: none;
+}
+
+/* ============================================================================
+   SPORT-SPECIFIC VARIANTS
+   ============================================================================ */
+
+/* F1 - Default styling already applied */
+.card-sport-f1 {
+  /* No additional changes needed */
+}
+
+/* NBA */
+.card-sport-nba {
+  --primary-color: #1d428a;
+  --secondary-color: #c4ced4;
+}
+
+/* NFL */
+.card-sport-nfl {
+  --primary-color: #013369;
+  --secondary-color: #b0b7bc;
+}
+
+/* MLB */
+.card-sport-mlb {
+  --primary-color: #0c2c56;
+  --secondary-color: #bd3039;
+}
+
+/* Soccer */
+.card-sport-soccer {
+  --primary-color: #1a472a;
+  --secondary-color: #ffffff;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .trading {
+    aspect-ratio: 180 / 270;
+  }
+
+  .card-number {
+    font-size: 42px;
+  }
+
+  .card-name {
+    font-size: 16px;
+  }
+
+  .card-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .card-stat {
+    padding: 4px;
+  }
+
+  .card-stat-value {
+    font-size: 14px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .trading {
+    aspect-ratio: 160 / 240;
+  }
+
+  .card-crest {
+    height: 20px;
+  }
+
+  .card-number {
+    font-size: 36px;
+  }
+
+  .card-team-label,
+  .card-code,
+  .card-position {
+    font-size: 10px;
+  }
+
+  .card-name {
+    font-size: 14px;
+  }
+
+  .card-subtext {
+    font-size: 10px;
+  }
+
+  .card-back-name {
+    font-size: 16px;
+  }
+
+  .card-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+
+  .card-stat-value {
+    font-size: 12px;
+  }
+
+  .card-stat-label {
+    font-size: 9px;
+  }
+
+  .card-back-footer {
+    font-size: 9px;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+/* Disable animations for users who prefer reduced motion */
+.trading-no-motion,
+.trading-no-motion .trading-inner,
+.trading-no-motion .holographic-shimmer,
+.trading-no-motion .holographic-light,
+.trading-no-motion .holographic-rainbow {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Ensure holographic static texture still shows */
+.trading-no-motion .holographic-texture {
+  opacity: 0.8;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  .trading {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .card-team-label,
+  .card-code,
+  .card-position {
+    color: #00ff99;
+  }
+
+  .card-stat-grid {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  .trading {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .trading-inner {
+    transform: none !important;
+  }
+
+  .trading-back {
+    display: none;
+  }
+
+  .holographic-shimmer,
+  .holographic-light,
+  .holographic-rainbow {
+    display: none;
+  }
+}
